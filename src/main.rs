@@ -4,6 +4,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use lambda_http::{RequestExt, Response, run, service_fn};
 use lambda_http::Error;
+use lambda_http::http::StatusCode;
 use tracing::{error, info};
 use crate::errors::ParseDurationError;
 
@@ -41,9 +42,10 @@ async fn function_handler_http(request: lambda_http::Request) -> Result<Response
             ))
         .unwrap_or_else(|e| {
             error!("error while processing: {e}");
-            Response::new(
-                format!("invalid input")
-            )
+            Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .body("invalid parameters".into())
+                .unwrap()
         }
         );
     Ok(response)
